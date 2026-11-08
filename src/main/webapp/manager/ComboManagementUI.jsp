@@ -23,12 +23,11 @@
     }
 
     String successMsg = (String) request.getAttribute("successMsg");
-    DecimalFormat df = new DecimalFormat("#,###");
 %>
     <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-3">
         <div class="container">
             <a class="navbar-brand fw-bold" href="<%=request.getContextPath()%>/manager/ManagerMainUI.jsp">
-                <i class="fa-solid fa-user-tie me-2"></i>RESTMAN - QUẢN LÝ COMBO
+                RESTMAN - QUẢN LÝ COMBO
             </a>
             <div class="text-white small">
                 Quản lý: <strong><%=manager.getFullName()%></strong>
@@ -37,11 +36,10 @@
     </nav>
 
     <div class="container my-4">
+        <!-- Thuộc tính ẩn manager -->
+        <input type="hidden" id="managerId" name="managerId" value="<%=manager.getId()%>" />
+
         <% if (successMsg != null && !successMsg.isEmpty()) { %>
-            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                <i class="fa-solid fa-circle-check me-2"></i><strong><%=successMsg%>!</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
             <script>
                 alert("<%=successMsg%>");
             </script>
@@ -50,27 +48,27 @@
         <div class="restman-card p-4">
             <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
                 <div>
-                    <h4 class="fw-bold mb-0"><i class="fa-solid fa-list-check text-danger me-2"></i>Danh sách thực đơn Combo</h4>
+                    <h4 class="fw-bold mb-0">Danh sách thực đơn Combo</h4>
                     <small class="text-muted">Các gói combo hiện có trên hệ thống thực đơn bán hàng</small>
                 </div>
                 <div class="d-flex gap-2">
                     <!-- Nút -btnAddCombo : button -->
                     <button type="button" id="btnAddCombo" name="btnAddCombo" class="btn btn-restman"
                             onclick="openPage('<%=request.getContextPath()%>/ComboServlet?action=showAddForm')">
-                        <i class="fa-solid fa-plus me-1"></i> Thêm combo mới
+                        Thêm combo mới
                     </button>
 
                     <!-- Nút -btnBack : button -->
                     <button type="button" id="btnBack" name="btnBack" class="btn btn-outline-secondary"
                             onclick="openPage('<%=request.getContextPath()%>/manager/ManagerMainUI.jsp')">
-                        <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
+                        Quay lại
                     </button>
                 </div>
             </div>
 
             <!-- Bảng -tblComboList : Table -->
             <div class="table-responsive">
-                <table id="tblComboList" class="table table-bordered table-hover align-middle table-restman mb-0">
+                <table id="tblComboList" name="tblComboList" class="table table-bordered align-middle table-restman mb-0">
                     <thead>
                         <tr class="text-center">
                             <th style="width: 60px;">TT</th>
@@ -92,7 +90,7 @@
                             <td class="text-center fw-semibold"><%=(i + 1)%></td>
                             <td class="text-center"><code><%=cb.getItemCode()%></code></td>
                             <td class="fw-bold"><%=cb.getName()%></td>
-                            <td class="text-end fw-bold text-danger"><%=df.format(cb.getPrice())%></td>
+                            <td class="text-end fw-bold text-danger"><%=new DecimalFormat("#,###").format(cb.getPrice())%></td>
                             <td>
                                 <ul class="mb-0 ps-3 small">
                                 <%
@@ -108,7 +106,18 @@
                             </td>
                             <td class="small text-muted"><%=cb.getDescription()%></td>
                             <td class="text-center">
-                                <img src="<%=cb.getImageUrl()%>" alt="<%=cb.getName()%>" class="food-thumb" />
+                                <%
+                                    String cbImg = cb.getImageUrl();
+                                    if (cbImg == null || cbImg.trim().isEmpty()) {
+                                        cbImg = request.getContextPath() + "/uploads/default-food.jpg";
+                                    } else if (!cbImg.startsWith("http://") && !cbImg.startsWith("https://")) {
+                                        if (!cbImg.startsWith(request.getContextPath())) {
+                                            cbImg = request.getContextPath() + (cbImg.startsWith("/") ? "" : "/") + cbImg;
+                                        }
+                                    }
+                                %>
+                                <img src="<%=cbImg%>" alt="<%=cb.getName()%>" class="food-thumb"
+                                     onerror="this.onerror=null; this.src='<%=request.getContextPath()%>/uploads/default-food.jpg';" />
                             </td>
                         </tr>
                     <%

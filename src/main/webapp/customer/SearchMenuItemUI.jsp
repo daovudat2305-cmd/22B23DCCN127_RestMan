@@ -32,13 +32,11 @@
 
     Integer selectedCatObj = (Integer) request.getAttribute("selectedCategory");
     int selectedCategory = (selectedCatObj != null) ? selectedCatObj : 0;
-
-    DecimalFormat df = new DecimalFormat("#,###");
 %>
     <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-3">
         <div class="container">
             <a class="navbar-brand fw-bold" href="<%=request.getContextPath()%>/customer/CustomerMainUI.jsp">
-                <i class="fa-solid fa-utensils me-2"></i>RESTMAN
+                RESTMAN
             </a>
             <div class="text-white small">
                 Khách hàng: <strong><%=customer.getFullName()%></strong>
@@ -47,21 +45,24 @@
     </nav>
 
     <div class="container my-4">
+        <!-- Thuộc tính ẩn customer -->
+        <input type="hidden" id="customerId" name="customerId" value="<%=customer.getId()%>" />
+
         <div class="restman-card p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
                 <div>
-                    <h4 class="fw-bold mb-0"><i class="fa-solid fa-magnifying-glass text-danger me-2"></i>Tìm kiếm thông tin món ăn</h4>
+                    <h4 class="fw-bold mb-0">Tìm kiếm thông tin món ăn</h4>
                     <small class="text-muted">Nhập từ khóa tên món ăn hoặc lọc theo thể loại thực đơn</small>
                 </div>
                 <!-- Nút -btnBack : button -->
                 <button type="button" id="btnBack" name="btnBack" class="btn btn-outline-secondary"
                         onclick="openPage('<%=request.getContextPath()%>/customer/CustomerMainUI.jsp')">
-                    <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
+                    Quay lại
                 </button>
             </div>
 
-            <form action="<%=request.getContextPath()%>/MenuItemServlet" method="get" class="row g-3 align-items-end">
-                <input type="hidden" name="action" value="searchMenuItem" />
+            <form id="formSearchMenuItem" action="<%=request.getContextPath()%>/MenuItemServlet" method="get" class="row g-3 align-items-end">
+                <input type="hidden" id="action" name="action" value="searchMenuItem" />
 
                 <!-- Ô nhập từ khóa -inKeyword : text -->
                 <div class="col-md-6">
@@ -90,7 +91,7 @@
                 <!-- Nút -btnSearch : button -->
                 <div class="col-md-2">
                     <button type="submit" id="btnSearch" name="btnSearch" class="btn btn-restman w-100">
-                        <i class="fa-solid fa-search me-1"></i> Tìm kiếm
+                        Tìm kiếm
                     </button>
                 </div>
             </form>
@@ -103,7 +104,6 @@
                 if (listResult == null) {
             %>
                 <div class="text-center text-muted py-4">
-                    <i class="fa-solid fa-book-open fa-2x mb-2 d-block"></i>
                     Vui lòng nhập từ khóa tên món ăn và bấm <strong>"Tìm kiếm"</strong> để tra cứu thực đơn.
                 </div>
             <%
@@ -111,13 +111,13 @@
             %>
                 <!-- Ngoại lệ 4.1: Không tìm thấy kết quả phù hợp -->
                 <div class="alert alert-warning text-center mb-0">
-                    <i class="fa-solid fa-circle-info me-1"></i> Không tìm thấy kết quả phù hợp
+                    Không tìm thấy kết quả phù hợp
                 </div>
             <%
                 } else {
             %>
                 <div class="table-responsive">
-                    <table id="tblMenuItem" class="table table-hover align-middle table-bordered table-restman mb-0">
+                    <table id="tblMenuItem" name="tblMenuItem" class="table align-middle table-bordered table-restman mb-0">
                         <thead>
                             <tr class="text-center">
                                 <th style="width: 60px;">TT</th>
@@ -148,18 +148,31 @@
                                     <% } %>
                                 </td>
                                 <td class="text-center"><%=item.getCategory() != null ? item.getCategory().getName() : ""%></td>
-                                <td class="text-end fw-bold text-danger"><%=df.format(item.getPrice())%></td>
+                                <td class="text-end fw-bold text-danger"><%=new DecimalFormat("#,###").format(item.getPrice())%></td>
                                 <td class="text-center">
-                                    <img src="<%=item.getImageUrl()%>" alt="<%=item.getName()%>" class="food-thumb" />
+                                    <%
+                                        String itemImg = item.getImageUrl();
+                                        if (itemImg == null || itemImg.trim().isEmpty()) {
+                                            itemImg = request.getContextPath() + "/uploads/default-food.jpg";
+                                        } else if (!itemImg.startsWith("http://") && !itemImg.startsWith("https://")) {
+                                            if (!itemImg.startsWith(request.getContextPath())) {
+                                                itemImg = request.getContextPath() + (itemImg.startsWith("/") ? "" : "/") + itemImg;
+                                            }
+                                        }
+                                    %>
+                                    <img src="<%=itemImg%>" alt="<%=item.getName()%>" class="food-thumb"
+                                         onerror="this.onerror=null; this.src='<%=request.getContextPath()%>/uploads/default-food.jpg';" />
                                 </td>
                                 <td class="text-center">
                                     <% if (isCombo) { %>
-                                        <a href="<%=request.getContextPath()%>/MenuItemServlet?action=viewComboDetail&comboId=<%=item.getId()%>"
+                                        <a id="btnViewDetail_<%=item.getId()%>" name="btnViewDetail"
+                                           href="<%=request.getContextPath()%>/MenuItemServlet?action=viewComboDetail&comboId=<%=item.getId()%>"
                                            class="btn btn-sm btn-outline-danger fw-semibold">
                                             Xem
                                         </a>
                                     <% } else { %>
-                                        <a href="<%=request.getContextPath()%>/MenuItemServlet?action=viewFoodDetail&foodId=<%=item.getId()%>"
+                                        <a id="btnViewDetail_<%=item.getId()%>" name="btnViewDetail"
+                                           href="<%=request.getContextPath()%>/MenuItemServlet?action=viewFoodDetail&foodId=<%=item.getId()%>"
                                            class="btn btn-sm btn-outline-primary fw-semibold">
                                             Xem
                                         </a>

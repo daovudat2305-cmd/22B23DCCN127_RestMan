@@ -18,15 +18,14 @@
     <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-3">
         <div class="container">
             <a class="navbar-brand fw-bold" href="<%=request.getContextPath()%>/manager/ManagerMainUI.jsp">
-                <i class="fa-solid fa-user-tie me-2"></i>RESTMAN - QUẢN TRỊ NHÀ HÀNG
+                RESTMAN - QUẢN TRỊ NHÀ HÀNG
             </a>
             <div class="d-flex align-items-center text-white">
                 <span class="me-3">
-                    <i class="fa-solid fa-id-badge me-1"></i>
                     Quản lý: <strong><%=manager.getFullName()%></strong> (<%=manager.getStaffCode()%>)
                 </span>
                 <a href="<%=request.getContextPath()%>/LoginServlet?action=logout" class="btn btn-outline-light btn-sm">
-                    <i class="fa-solid fa-right-from-bracket me-1"></i> Đăng xuất
+                    Đăng xuất
                 </a>
             </div>
         </div>
@@ -34,6 +33,9 @@
 
     <div class="container my-5">
         <div class="restman-card p-4 p-md-5 text-center mx-auto" style="max-width: 720px;">
+            <!-- Thuộc tính ẩn manager -->
+            <input type="hidden" id="managerId" name="managerId" value="<%=manager.getId()%>" />
+
             <span class="badge bg-warning text-dark px-3 py-2 rounded-pill mb-3 fw-semibold">
                 Phân hệ Nhân viên Quản lý
             </span>
@@ -46,8 +48,8 @@
             <div class="d-flex justify-content-center">
                 <a id="linkManageCombo" name="linkManageCombo"
                    href="<%=request.getContextPath()%>/ComboServlet?action=listCombos"
-                   class="btn btn-restman btn-lg px-4 py-3 shadow-sm">
-                    <i class="fa-solid fa-layer-group me-2"></i> Quản lý combo (Create Combo Menu)
+                   class="btn btn-restman btn-lg px-4 py-3">
+                    Quản lý combo
                 </a>
             </div>
         </div>

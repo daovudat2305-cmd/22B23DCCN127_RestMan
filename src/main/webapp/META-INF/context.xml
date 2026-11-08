@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context reloadable="true">
+    <Resources>
+        <PreResources className="org.apache.catalina.webresources.DirResourceSet"
+                      base="G:/RestMan/src/main/webapp/uploads"
+                      webAppMount="/uploads" />
+    </Resources>
+</Context>
+

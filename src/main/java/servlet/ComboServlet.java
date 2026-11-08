@@ -23,7 +23,7 @@ import model.ComboItem7;
 import model.Food7;
 import model.MenuItemCategory7;
 
-@WebServlet("/ComboServlet")
+@WebServlet(value = "/ComboServlet", loadOnStartup = 1)
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 2, // 2MB
     maxFileSize = 1024 * 1024 * 10,      // 10MB
@@ -40,6 +40,39 @@ public class ComboServlet extends HttpServlet {
         comboDAO = new ComboDAO();
         foodDAO = new FoodDAO();
         menuItemCategoryDAO = new MenuItemCategoryDAO();
+        syncUploadsToDeployDirectory();
+    }
+
+    /**
+     * Tự động đồng bộ các file ảnh từ thư mục source src/main/webapp/uploads sang
+     * thư mục deploy wtpwebapps/RestMan/uploads khi Tomcat khởi động hoặc servlet nạp
+     */
+    private void syncUploadsToDeployDirectory() {
+        try {
+            String deployUploadDirPath = getServletContext().getRealPath("/uploads");
+            if (deployUploadDirPath != null) {
+                File deployDir = new File(deployUploadDirPath);
+                if (!deployDir.exists()) {
+                    deployDir.mkdirs();
+                }
+                File sourceDir = new File("G:/RestMan/src/main/webapp/uploads");
+                if (sourceDir.exists() && sourceDir.isDirectory()) {
+                    File[] files = sourceDir.listFiles();
+                    if (files != null) {
+                        for (File f : files) {
+                            if (f.isFile()) {
+                                File dest = new File(deployDir, f.getName());
+                                if (!dest.exists() || dest.length() != f.length()) {
+                                    Files.copy(f.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -205,7 +238,6 @@ public class ComboServlet extends HttpServlet {
                 ComboItem7 newItem = new ComboItem7();
                 newItem.setFood(food);
                 newItem.setQuantity(quantity);
-                newItem.setNote("");
                 listComboItems.add(newItem);
             }
         }
@@ -371,15 +403,29 @@ public class ComboServlet extends HttpServlet {
             String safeName = submittedFileName.replaceAll("[^a-zA-Z0-9._-]", "_");
             String fileName = "combo_" + System.currentTimeMillis() + "_" + safeName;
 
-            String uploadDirPath = getServletContext().getRealPath("") + File.separator + "uploads";
-            File uploadDir = new File(uploadDirPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
+            // 1. Luôn lưu vào thư mục source code của project trước (bền vững, không bị Eclipse xóa)
+            File sourceUploadDir = new File("G:/RestMan/src/main/webapp/uploads");
+            if (!sourceUploadDir.exists()) {
+                sourceUploadDir.mkdirs();
+            }
+            File sourceDestFile = new File(sourceUploadDir, fileName);
+            try (InputStream input = filePart.getInputStream()) {
+                Files.copy(input, sourceDestFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
 
-            File destFile = new File(uploadDir, fileName);
-            try (InputStream input = filePart.getInputStream()) {
-                Files.copy(input, destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            // 2. Đồng thời copy sang thư mục runtime wtpwebapps (nếu có) để phục vụ ngay
+            try {
+                String uploadDirPath = getServletContext().getRealPath("/uploads");
+                if (uploadDirPath != null) {
+                    File uploadDir = new File(uploadDirPath);
+                    if (!uploadDir.exists()) {
+                        uploadDir.mkdirs();
+                    }
+                    File destFile = new File(uploadDir, fileName);
+                    Files.copy(sourceDestFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (Exception ex) {
+                // Không sao nếu wtpwebapps chưa sẵn sàng vì ImageServlet sẽ phục vụ từ source
             }
 
             return request.getContextPath() + "/uploads/" + fileName;

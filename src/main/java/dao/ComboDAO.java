@@ -28,7 +28,7 @@ public class ComboDAO extends DAO {
                           "JOIN tblMenuItemCategory7 c ON m.tblMenuItemCategory7id = c.id " +
                           "WHERE m.id = ?";
 
-        String sqlItems = "SELECT ci.id AS ciId, ci.quantity, ci.note, " +
+        String sqlItems = "SELECT ci.id AS ciId, ci.quantity, " +
                           "m.id AS foodId, m.itemCode, m.name, m.price, m.imageUrl, m.description, f.unit, " +
                           "c.id AS catId, c.categoryCode, c.name AS catName, c.description AS catDesc " +
                           "FROM tblComboItem7 ci " +
@@ -80,7 +80,6 @@ public class ComboDAO extends DAO {
                     ComboItem7 ci = new ComboItem7();
                     ci.setId(rsItems.getInt("ciId"));
                     ci.setQuantity(rsItems.getInt("quantity"));
-                    ci.setNote(rsItems.getString("note"));
                     ci.setFood(food);
                     items.add(ci);
                 }
@@ -127,7 +126,7 @@ public class ComboDAO extends DAO {
         String sqlFindComboCat = "SELECT id FROM tblMenuItemCategory7 WHERE LOWER(name) = 'combo' LIMIT 1";
         String sqlInsertMenuItem = "INSERT INTO tblMenuItem7(itemCode, name, price, imageUrl, description, tblMenuItemCategory7id) VALUES(?, ?, ?, ?, ?, ?)";
         String sqlInsertCombo = "INSERT INTO tblCombo7(tblMenuItem7id) VALUES(?)";
-        String sqlInsertComboItem = "INSERT INTO tblComboItem7(quantity, note, tblCombo7id, tblFood7id) VALUES(?, ?, ?, ?)";
+        String sqlInsertComboItem = "INSERT INTO tblComboItem7(quantity, tblCombo7id, tblFood7id) VALUES(?, ?, ?)";
 
         try {
             con.setAutoCommit(false);
@@ -173,9 +172,8 @@ public class ComboDAO extends DAO {
             for (ComboItem7 item : combo.getComboItems()) {
                 PreparedStatement psItem = con.prepareStatement(sqlInsertComboItem);
                 psItem.setInt(1, item.getQuantity());
-                psItem.setString(2, item.getNote() != null ? item.getNote() : "");
-                psItem.setInt(3, newComboId);
-                psItem.setInt(4, item.getFood().getId());
+                psItem.setInt(2, newComboId);
+                psItem.setInt(3, item.getFood().getId());
                 psItem.executeUpdate();
             }
 

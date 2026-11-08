@@ -65,20 +65,25 @@
     if (draftDesc == null) draftDesc = "";
 
     String errorMsg = (String) request.getAttribute("errorMsg");
-    DecimalFormat df = new DecimalFormat("#,###");
 %>
     <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-3">
         <div class="container">
             <a class="navbar-brand fw-bold" href="<%=request.getContextPath()%>/manager/ManagerMainUI.jsp">
-                <i class="fa-solid fa-user-tie me-2"></i>RESTMAN - LÊN MENU COMBO
+                RESTMAN - LÊN MENU COMBO
             </a>
+            <div class="text-white small">
+                Quản lý: <strong><%=manager.getFullName()%></strong>
+            </div>
         </div>
     </nav>
 
     <div class="container my-4">
+        <!-- Thuộc tính ẩn manager -->
+        <input type="hidden" id="managerId" name="managerId" value="<%=manager.getId()%>" />
+
         <% if (errorMsg != null && !errorMsg.isEmpty()) { %>
-            <div class="alert alert-danger shadow-sm">
-                <i class="fa-solid fa-triangle-exclamation me-2"></i><%=errorMsg%>
+            <div class="alert alert-danger">
+                <%=errorMsg%>
             </div>
         <% } %>
 
@@ -87,11 +92,11 @@
             <div class="col-lg-6">
                 <div class="restman-card p-4 h-100">
                     <h5 class="fw-bold border-bottom pb-2 mb-3">
-                        <i class="fa-solid fa-magnifying-glass text-danger me-2"></i>1. Tìm kiếm món ăn đưa vào Combo
+                        1. Tìm kiếm món ăn đưa vào Combo
                     </h5>
 
                     <form id="searchFoodForm" action="<%=request.getContextPath()%>/ComboServlet" method="get" class="row g-2 align-items-end mb-3">
-                        <input type="hidden" name="action" value="searchFood" />
+                        <input type="hidden" id="searchFoodAction" name="action" value="searchFood" />
                         <input type="hidden" name="inComboName" value="<%=draftName%>" />
                         <input type="hidden" name="inComboPrice" value="<%=draftPrice%>" />
                         <input type="hidden" name="inComboImage" value="<%=draftImage%>" />
@@ -121,14 +126,14 @@
                         <div class="col-md-3">
                             <button type="submit" id="btnSearchFood" name="btnSearchFood" class="btn btn-restman btn-sm w-100"
                                     onclick="syncDraftToForm('searchFoodForm')">
-                                <i class="fa-solid fa-search me-1"></i> Tìm món
+                                Tìm món
                             </button>
                         </div>
                     </form>
 
                     <!-- Bảng danh sách món ăn tìm được -tblSearchedFood : Table -->
                     <div class="table-responsive">
-                        <table id="tblSearchedFood" class="table table-bordered table-hover align-middle table-restman small mb-0">
+                        <table id="tblSearchedFood" name="tblSearchedFood" class="table table-bordered align-middle table-restman small mb-0">
                             <thead>
                                 <tr class="text-center">
                                     <th>TT</th>
@@ -166,7 +171,7 @@
                                     <td class="text-center"><code><%=f.getItemCode()%></code></td>
                                     <td class="fw-semibold"><%=f.getName()%></td>
                                     <td class="text-center"><%=f.getCategory() != null ? f.getCategory().getName() : ""%></td>
-                                    <td class="text-end fw-semibold"><%=df.format(f.getPrice())%></td>
+                                    <td class="text-end fw-semibold"><%=new DecimalFormat("#,###").format(f.getPrice())%></td>
                                     <td>
                                         <form id="selectForm_<%=f.getId()%>" action="<%=request.getContextPath()%>/ComboServlet" method="post" class="d-flex gap-1">
                                             <input type="hidden" name="action" value="addFoodToCombo" />
@@ -177,11 +182,11 @@
                                             <input type="hidden" name="inComboDescription" value="" />
 
                                             <!-- Ô nhập số lượng suất -inQuantity : text -->
-                                            <input type="number" id="inQuantity" name="inQuantity" value="1" min="1" max="50"
+                                            <input type="number" id="inQuantity_<%=f.getId()%>" name="inQuantity" value="1" min="1" max="50"
                                                    class="form-control form-control-sm text-center" style="width: 58px;" required />
 
                                             <!-- Nút chọn món -btnSelectFood : button -->
-                                            <button type="submit" id="btnSelectFood" name="btnSelectFood"
+                                            <button type="submit" id="btnSelectFood_<%=f.getId()%>" name="btnSelectFood"
                                                     class="btn btn-sm btn-outline-success fw-semibold"
                                                     onclick="syncDraftToForm('selectForm_<%=f.getId()%>')">
                                                 Chọn
@@ -203,12 +208,12 @@
             <div class="col-lg-6">
                 <div class="restman-card p-4 h-100">
                     <h5 class="fw-bold border-bottom pb-2 mb-3">
-                        <i class="fa-solid fa-utensils text-danger me-2"></i>2. Các món trong Combo
+                        2. Các món trong Combo
                     </h5>
 
                     <!-- Bảng các món trong combo -tblComboItems : Table -->
                     <div class="table-responsive mb-3">
-                        <table id="tblComboItems" class="table table-bordered align-middle table-restman small mb-0">
+                        <table id="tblComboItems" name="tblComboItems" class="table table-bordered align-middle table-restman small mb-0">
                             <thead>
                                 <tr class="text-center">
                                     <th>TT</th>
@@ -243,8 +248,8 @@
                                     <td class="fw-semibold"><%=f.getName()%></td>
                                     <td class="text-center"><%=f.getCategory() != null ? f.getCategory().getName() : ""%></td>
                                     <td class="text-center fw-bold"><%=ci.getQuantity()%></td>
-                                    <td class="text-end"><%=df.format(f.getPrice())%></td>
-                                    <td class="text-end fw-bold"><%=df.format(subTotal)%></td>
+                                    <td class="text-end"><%=new DecimalFormat("#,###").format(f.getPrice())%></td>
+                                    <td class="text-end fw-bold"><%=new DecimalFormat("#,###").format(subTotal)%></td>
                                     <td class="text-center">
                                         <form id="removeForm_<%=f.getId()%>" action="<%=request.getContextPath()%>/ComboServlet" method="post" class="d-inline">
                                             <input type="hidden" name="action" value="removeFoodFromCombo" />
@@ -254,7 +259,7 @@
                                             <input type="hidden" name="inComboImage" value="" />
                                             <input type="hidden" name="inComboDescription" value="" />
                                             <!-- Nút xóa món khỏi combo -btnRemoveFood : button -->
-                                            <button type="submit" id="btnRemoveFood" name="btnRemoveFood"
+                                            <button type="submit" id="btnRemoveFood_<%=f.getId()%>" name="btnRemoveFood"
                                                     class="btn btn-sm btn-outline-danger"
                                                     onclick="syncDraftToForm('removeForm_<%=f.getId()%>')">
                                                 Xóa
@@ -274,18 +279,18 @@
                     <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded border mb-4">
                         <span class="fw-semibold">Tổng tiền giá lẻ gốc tạm tính:</span>
                         <input type="text" id="totalOriginalPrice" name="totalOriginalPrice"
-                               class="form-control form-control-sm text-end fw-bold text-danger border-0 bg-transparent"
-                               style="width: 180px; font-size: 1rem;"
-                               value="<%=df.format(totalOriginalPrice)%> VNĐ" readonly />
+                                class="form-control form-control-sm text-end fw-bold text-danger border-0 bg-transparent"
+                                style="width: 180px; font-size: 1rem;"
+                                value="<%=new DecimalFormat("#,###").format(totalOriginalPrice)%> VNĐ" readonly />
                     </div>
 
                     <h5 class="fw-bold border-bottom pb-2 mb-3">
-                        <i class="fa-solid fa-file-pen text-danger me-2"></i>3. Thông tin chung của Combo
+                        3. Thông tin chung của Combo
                     </h5>
 
                     <!-- Form lưu Combo có enctype="multipart/form-data" để gửi file ảnh -->
                     <form id="saveComboForm" action="<%=request.getContextPath()%>/ComboServlet" method="post" enctype="multipart/form-data">
-                        <input type="hidden" name="action" value="saveCombo" />
+                        <input type="hidden" id="saveComboAction" name="action" value="saveCombo" />
                         <input type="hidden" id="savedDraftImage" value="<%=draftImage%>" />
 
                         <div class="row g-3">
@@ -314,7 +319,8 @@
                                 <div id="imagePreviewContainer" class="mt-2 <%= draftImage.isEmpty() ? "d-none" : "" %>">
                                     <span class="small text-muted d-block mb-1">Ảnh minh họa đã chọn:</span>
                                     <img id="comboImagePreview" src="<%=draftImage%>" alt="Preview"
-                                         class="rounded border shadow-sm" style="max-height: 110px; object-fit: cover;" />
+                                         class="rounded border" style="max-height: 110px; object-fit: cover;"
+                                         onerror="this.onerror=null; this.src='<%=request.getContextPath()%>/uploads/default-food.jpg';" />
                                 </div>
                             </div>
 
@@ -338,7 +344,7 @@
                             <button type="submit" id="btnConfirmSave" name="btnConfirmSave"
                                     class="btn btn-restman px-4"
                                     <%= listComboItems.isEmpty() ? "disabled" : "" %>>
-                                <i class="fa-solid fa-floppy-disk me-1"></i> Xác nhận lưu combo
+                                Xác nhận lưu combo
                             </button>
                         </div>
                     </form>

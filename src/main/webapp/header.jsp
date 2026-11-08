@@ -3,41 +3,44 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 <style>
     body {
-        background-color: #f8f6f2;
+        background-color: #f8f9fa;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #2c2523;
+        color: #212529;
     }
     .restman-navbar {
-        background: linear-gradient(135deg, #1f1c18 0%, #8e0e00 100%);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+        background-color: #8e0e00;
     }
     .restman-card {
         background: #ffffff;
-        border: none;
-        border-radius: 14px;
-        box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
     }
     .btn-restman {
         background-color: #8e0e00;
         color: #fff;
-        border-radius: 8px;
+        border-radius: 6px;
         font-weight: 600;
-        transition: all 0.2s;
+        border: 1px solid #8e0e00;
     }
     .btn-restman:hover {
-        background-color: #6b0a00;
+        background-color: #720b00;
         color: #fff;
-        transform: translateY(-1px);
+        border-color: #720b00;
+    }
+    /* Bỏ hiệu ứng chuyển động, rung nảy khi hover */
+    .btn, .btn:hover, .btn-restman, .btn-restman:hover, .restman-card, .table {
+        transition: none !important;
+        transform: none !important;
     }
     .table-restman thead {
-        background-color: #2c2523;
+        background-color: #212529;
         color: #ffffff;
     }
     .food-thumb {
         width: 72px;
         height: 54px;
         object-fit: cover;
-        border-radius: 8px;
+        border-radius: 6px;
         border: 1px solid #dee2e6;
     }
     .badge-food {
