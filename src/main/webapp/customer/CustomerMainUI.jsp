@@ -15,7 +15,7 @@
         return;
     }
 %>
-    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-3">
+    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-2">
         <div class="container">
             <a class="navbar-brand fw-bold" href="<%=request.getContextPath()%>/customer/CustomerMainUI.jsp">
                 RESTMAN - KHÁCH HÀNG TRỰC TUYẾN
@@ -24,31 +24,29 @@
                 <span class="me-3">
                     Xin chào, <strong><%=customer.getFullName()%></strong> (<%=customer.getCustomerCode()%>)
                 </span>
-                <a href="<%=request.getContextPath()%>/LoginServlet?action=logout" class="btn btn-outline-light btn-sm">
+                <button type="button" id="btnLogout" name="btnLogout" class="btn btn-outline-light btn-sm"
+                        onclick="openPage('<%=request.getContextPath()%>/LoginServlet?action=logout')">
                     Đăng xuất
-                </a>
+                </button>
             </div>
         </div>
     </nav>
 
     <div class="container my-5">
-        <div class="restman-card p-4 p-md-5 text-center mx-auto" style="max-width: 720px;">
+        <div class="restman-card p-4 p-md-5 text-center mx-auto" style="max-width: 680px;">
             <!-- Thuộc tính ẩn customer -->
             <input type="hidden" id="customerId" name="customerId" value="<%=customer.getId()%>" />
 
-            <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill mb-3 fw-semibold">
+            <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill mb-3 fw-semibold">
                 Cổng Dịch Vụ Khách Hàng Trực Tuyến
             </span>
-            <h2 class="fw-bold mb-3">Chào mừng quý khách đến với Nhà hàng RestMan</h2>
-            <p class="text-muted mb-4">
-                Tra cứu thực đơn món ăn đơn lẻ và các gói Combo ưu đãi đặc biệt của nhà hàng.
-            </p>
+            <h3 class="fw-bold mb-3">Chào mừng quý khách đến với Nhà hàng RestMan</h3>
 
             <!-- Liên kết -linkSearchMenuItem : link theo đúng sơ đồ lớp thiết kế -->
             <div class="d-flex justify-content-center gap-3">
                 <a id="linkSearchMenuItem" name="linkSearchMenuItem"
                    href="<%=request.getContextPath()%>/MenuItemServlet?action=showSearchForm"
-                   class="btn btn-restman btn-lg px-4 py-3">
+                   class="btn btn-restman px-4 py-2">
                     Tìm kiếm món ăn
                 </a>
             </div>

@@ -1,17 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
-    import="java.util.ArrayList, java.text.DecimalFormat, model.*"%>
+    import="java.util.ArrayList, java.text.DecimalFormat, java.math.BigDecimal, model.*"%>
 <%!
     /**
      * Hàm tính tổng giá gốc từ danh sách món ăn thành phần trong Combo.
      */
-    public float calculateTotalOriginalPrice(ArrayList<ComboItem7> items) {
+    public BigDecimal calculateTotalOriginalPrice(ArrayList<ComboItem7> items) {
         if (items == null || items.isEmpty()) {
-            return 0f;
+            return BigDecimal.ZERO;
         }
-        float total = 0f;
+        BigDecimal total = BigDecimal.ZERO;
         for (ComboItem7 ci : items) {
-            if (ci != null && ci.getFood() != null) {
-                total += ci.getFood().getPrice() * ci.getQuantity();
+            if (ci != null && ci.getFood() != null && ci.getFood().getPrice() != null) {
+                total = total.add(ci.getFood().getPrice().multiply(BigDecimal.valueOf(ci.getQuantity())));
             }
         }
         return total;
@@ -32,10 +32,10 @@
         return;
     }
 
-    // Thuộc tính đối tượng -comboItem : Combo7 theo đúng sơ đồ lớp thiết kế 3.3.2
+    // Thuộc tính đối tượng -comboItem : Combo7
     Combo7 comboItem = (Combo7) request.getAttribute("comboItem");
 %>
-    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-3">
+    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-2">
         <div class="container">
             <a class="navbar-brand fw-bold" href="<%=request.getContextPath()%>/customer/CustomerMainUI.jsp">
                 RESTMAN
@@ -46,14 +46,14 @@
         </div>
     </nav>
 
-    <div class="container my-5">
+    <div class="container my-4">
         <!-- Thuộc tính ẩn customer -->
         <input type="hidden" id="customerId" name="customerId" value="<%=customer.getId()%>" />
 
-        <div class="restman-card p-4 p-md-5 mx-auto" style="max-width: 900px;">
-            <h4 class="fw-bold border-bottom pb-3 mb-4">
+        <div class="restman-card p-4 mx-auto" style="max-width: 860px;">
+            <h5 class="fw-bold border-bottom pb-3 mb-4">
                 Thông tin chi tiết thực đơn Combo
-            </h4>
+            </h5>
 
             <% if (comboItem != null) { %>
                 <input type="hidden" id="comboId" name="comboId" value="<%=comboItem.getId()%>" />
@@ -77,7 +77,7 @@
                         <small class="text-muted d-block mt-2">Bấm vào ảnh để xem kích thước lớn</small>
                     </div>
                     <div class="col-md-7">
-                        <table class="table table-bordered mb-0">
+                        <table id="tblComboDetail" class="table table-bordered mb-0">
                             <tbody>
                                 <tr>
                                     <th class="bg-light" style="width: 38%;">Mã Combo</th>
@@ -127,7 +127,7 @@
                                 <td class="text-center"><%=(i + 1)%></td>
                                 <td class="text-center"><code><%=f.getItemCode()%></code></td>
                                 <td class="fw-semibold"><%=f.getName()%></td>
-                                <td class="text-center"><%=f.getCategory() != null ? f.getCategory().getName() : ""%></td>
+                                <td class="text-center"><%=f.getMenuItemCategory() != null ? f.getMenuItemCategory().getName() : ""%></td>
                                 <td class="text-center"><%=f.getUnit()%></td>
                                 <td class="text-center fw-bold"><%=ci.getQuantity()%></td>
                                 <td class="text-end"><%=new DecimalFormat("#,###").format(f.getPrice())%></td>
@@ -141,9 +141,9 @@
                 </div>
 
                 <%
-                    float totalOriginalPrice = calculateTotalOriginalPrice(items);
+                    BigDecimal totalOriginalPrice = calculateTotalOriginalPrice(items);
                 %>
-                <!-- Dòng hiển thị tổng giá gốc bên dưới bảng (nằm sát cạnh nhau, căn lề phải) -->
+                <!-- Tổng giá gốc -->
                 <div class="text-end bg-light p-3 rounded border mt-3">
                     <span class="fw-bold">Tổng giá gốc:</span>
                     <span id="totalOriginalPrice" name="totalOriginalPrice" class="fw-bold text-danger fs-5 ms-2">

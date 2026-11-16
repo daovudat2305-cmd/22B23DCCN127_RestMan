@@ -15,10 +15,10 @@
         return;
     }
 
-    // Thuộc tính đối tượng -foodItem : Food7 theo đúng sơ đồ lớp thiết kế 3.3.2
+    // Thuộc tính đối tượng -foodItem : Food7
     Food7 foodItem = (Food7) request.getAttribute("foodItem");
 %>
-    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-3">
+    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-2">
         <div class="container">
             <a class="navbar-brand fw-bold" href="<%=request.getContextPath()%>/customer/CustomerMainUI.jsp">
                 RESTMAN
@@ -29,14 +29,14 @@
         </div>
     </nav>
 
-    <div class="container my-5">
+    <div class="container my-4">
         <!-- Thuộc tính ẩn customer -->
         <input type="hidden" id="customerId" name="customerId" value="<%=customer.getId()%>" />
 
-        <div class="restman-card p-4 p-md-5 mx-auto" style="max-width: 850px;">
-            <h4 class="fw-bold border-bottom pb-3 mb-4">
+        <div class="restman-card p-4 mx-auto" style="max-width: 820px;">
+            <h5 class="fw-bold border-bottom pb-3 mb-4">
                 Thông tin chi tiết món ăn
-            </h4>
+            </h5>
 
             <% if (foodItem != null) { %>
                 <input type="hidden" id="foodId" name="foodId" value="<%=foodItem.getId()%>" />
@@ -60,7 +60,7 @@
                         <small class="text-muted d-block mt-2">Bấm vào ảnh để xem kích thước lớn</small>
                     </div>
                     <div class="col-md-7">
-                        <table class="table table-bordered mb-0">
+                        <table id="tblFoodDetail" class="table table-bordered mb-0">
                             <tbody>
                                 <tr>
                                     <th class="bg-light" style="width: 38%;">Mã món ăn</th>
@@ -72,7 +72,7 @@
                                 </tr>
                                 <tr>
                                     <th class="bg-light">Thể loại món</th>
-                                    <td id="foodCategory"><span class="badge bg-primary"><%=foodItem.getCategory() != null ? foodItem.getCategory().getName() : ""%></span></td>
+                                    <td id="foodCategory"><span class="badge bg-primary"><%=foodItem.getMenuItemCategory() != null ? foodItem.getMenuItemCategory().getName() : ""%></span></td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light">Đơn giá niêm yết</th>

@@ -3,6 +3,7 @@ package controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -153,11 +154,11 @@ public class ComboServlet extends HttpServlet {
         session.removeAttribute("draftComboPrice");
         session.removeAttribute("draftComboImage");
         session.removeAttribute("draftComboDescription");
-        session.setAttribute("totalOriginalPrice", 0f);
+        session.setAttribute("totalOriginalPrice", BigDecimal.ZERO);
 
         request.setAttribute("listFoodCategories", listFoodCategories);
         request.setAttribute("listComboItems", listComboItems);
-        request.setAttribute("totalOriginalPrice", 0f);
+        request.setAttribute("totalOriginalPrice", BigDecimal.ZERO);
         request.getRequestDispatcher("/manager/AddComboUI.jsp").forward(request, response);
     }
 
@@ -185,7 +186,7 @@ public class ComboServlet extends HttpServlet {
             listComboItems = new ArrayList<>();
         }
 
-        float totalOriginalPrice = calculateTotalOriginalPrice(listComboItems);
+        BigDecimal totalOriginalPrice = calculateTotalOriginalPrice(listComboItems);
 
         session.setAttribute("listFoodCategories", listFoodCategories);
         session.setAttribute("listSearchedFood", listSearchedFood);
@@ -242,7 +243,7 @@ public class ComboServlet extends HttpServlet {
             }
         }
 
-        float totalOriginalPrice = calculateTotalOriginalPrice(listComboItems);
+        BigDecimal totalOriginalPrice = calculateTotalOriginalPrice(listComboItems);
         ArrayList<MenuItemCategory7> listFoodCategories = (ArrayList<MenuItemCategory7>) session.getAttribute("listFoodCategories");
         if (listFoodCategories == null) {
             listFoodCategories = menuItemCategoryDAO.getAllFoodCategories();
@@ -274,7 +275,7 @@ public class ComboServlet extends HttpServlet {
             listComboItems = new ArrayList<>();
         }
 
-        float totalOriginalPrice = calculateTotalOriginalPrice(listComboItems);
+        BigDecimal totalOriginalPrice = calculateTotalOriginalPrice(listComboItems);
         ArrayList<MenuItemCategory7> listFoodCategories = (ArrayList<MenuItemCategory7>) session.getAttribute("listFoodCategories");
         if (listFoodCategories == null) {
             listFoodCategories = menuItemCategoryDAO.getAllFoodCategories();
@@ -328,11 +329,11 @@ public class ComboServlet extends HttpServlet {
             return;
         }
 
-        float price = 0;
+        BigDecimal price = BigDecimal.ZERO;
         try {
-            price = Float.parseFloat(priceStr.replace(".", "").replace(",", "").trim());
-        } catch (NumberFormatException e) {
-            price = 0;
+            price = new BigDecimal(priceStr.replace(".", "").replace(",", "").trim());
+        } catch (Exception e) {
+            price = BigDecimal.ZERO;
         }
 
         if (uploadedUrl == null || uploadedUrl.trim().isEmpty()) {
@@ -435,11 +436,13 @@ public class ComboServlet extends HttpServlet {
         }
     }
 
-    private float calculateTotalOriginalPrice(ArrayList<ComboItem7> listComboItems) {
-        if (listComboItems == null) return 0f;
-        float total = 0f;
+    private BigDecimal calculateTotalOriginalPrice(ArrayList<ComboItem7> listComboItems) {
+        if (listComboItems == null) return BigDecimal.ZERO;
+        BigDecimal total = BigDecimal.ZERO;
         for (ComboItem7 ci : listComboItems) {
-            total += ci.getFood().getPrice() * ci.getQuantity();
+            if (ci.getFood() != null && ci.getFood().getPrice() != null) {
+                total = total.add(ci.getFood().getPrice().multiply(BigDecimal.valueOf(ci.getQuantity())));
+            }
         }
         return total;
     }

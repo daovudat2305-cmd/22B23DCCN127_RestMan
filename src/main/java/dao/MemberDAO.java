@@ -1,5 +1,6 @@
 package dao;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import model.Customer7;
@@ -33,7 +34,8 @@ public class MemberDAO extends DAO {
             if (rs.next()) {
                 member.setId(rs.getInt("id"));
                 member.setFullName(rs.getString("fullName"));
-                member.setDob(rs.getDate("dob"));
+                Date dobDate = rs.getDate("dob");
+                member.setDob(dobDate != null ? dobDate.toLocalDate() : null);
                 member.setAddress(rs.getString("address"));
                 member.setEmail(rs.getString("email"));
                 member.setPhone(rs.getString("phone"));
@@ -66,7 +68,8 @@ public class MemberDAO extends DAO {
                 customer.setAddress(rs.getString("address"));
                 customer.setRole(rs.getString("role"));
                 customer.setCustomerCode(rs.getString("customerCode") != null ? rs.getString("customerCode") : "KH00" + memberId);
-                customer.setRegistrationDate(rs.getDate("registrationDate"));
+                Date regDate = rs.getDate("registrationDate");
+                customer.setRegistrationDate(regDate != null ? regDate.toLocalDate() : null);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,6 +95,9 @@ public class MemberDAO extends DAO {
                 manager.setRole(rs.getString("role"));
                 manager.setStaffCode(rs.getString("staffCode") != null ? rs.getString("staffCode") : "QL00" + memberId);
                 manager.setPosition(rs.getString("position") != null ? rs.getString("position") : "Quản lý");
+                Date hireDate = rs.getDate("hireDate");
+                manager.setHireDate(hireDate != null ? hireDate.toLocalDate() : null);
+                manager.setSalary(rs.getBigDecimal("salary"));
             }
         } catch (Exception e) {
             e.printStackTrace();

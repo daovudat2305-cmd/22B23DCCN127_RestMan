@@ -45,7 +45,7 @@ public class ComboDAO extends DAO {
                 combo.setId(rs.getInt("id"));
                 combo.setItemCode(rs.getString("itemCode"));
                 combo.setName(rs.getString("name"));
-                combo.setPrice(rs.getFloat("price"));
+                combo.setPrice(rs.getBigDecimal("price"));
                 combo.setImageUrl(rs.getString("imageUrl"));
                 combo.setDescription(rs.getString("description"));
 
@@ -55,7 +55,7 @@ public class ComboDAO extends DAO {
                     rs.getString("catName"),
                     rs.getString("catDesc")
                 );
-                combo.setCategory(cat);
+                combo.setMenuItemCategory(cat);
 
                 PreparedStatement psItems = con.prepareStatement(sqlItems);
                 psItems.setInt(1, comboId);
@@ -66,11 +66,11 @@ public class ComboDAO extends DAO {
                     food.setId(rsItems.getInt("foodId"));
                     food.setItemCode(rsItems.getString("itemCode"));
                     food.setName(rsItems.getString("name"));
-                    food.setPrice(rsItems.getFloat("price"));
+                    food.setPrice(rsItems.getBigDecimal("price"));
                     food.setImageUrl(rsItems.getString("imageUrl"));
                     food.setDescription(rsItems.getString("description"));
                     food.setUnit(rsItems.getString("unit"));
-                    food.setCategory(new MenuItemCategory7(
+                    food.setMenuItemCategory(new MenuItemCategory7(
                         rsItems.getInt("catId"),
                         rsItems.getString("categoryCode"),
                         rsItems.getString("catName"),
@@ -150,7 +150,7 @@ public class ComboDAO extends DAO {
             PreparedStatement psMenu = con.prepareStatement(sqlInsertMenuItem, Statement.RETURN_GENERATED_KEYS);
             psMenu.setString(1, combo.getItemCode());
             psMenu.setString(2, combo.getName());
-            psMenu.setFloat(3, combo.getPrice());
+            psMenu.setBigDecimal(3, combo.getPrice());
             psMenu.setString(4, combo.getImageUrl());
             psMenu.setString(5, combo.getDescription());
             psMenu.setInt(6, comboCatId);

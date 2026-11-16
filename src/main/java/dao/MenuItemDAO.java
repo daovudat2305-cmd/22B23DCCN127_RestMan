@@ -72,10 +72,10 @@ public class MenuItemDAO extends DAO {
                 item.setId(rs.getInt("id"));
                 item.setItemCode(rs.getString("itemCode"));
                 item.setName(rs.getString("name"));
-                item.setPrice(rs.getFloat("price"));
+                item.setPrice(rs.getBigDecimal("price"));
                 item.setImageUrl(rs.getString("imageUrl"));
                 item.setDescription(rs.getString("description"));
-                item.setCategory(cat);
+                item.setMenuItemCategory(cat);
 
                 list.add(item);
             }

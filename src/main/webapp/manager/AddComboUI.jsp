@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
-    import="java.util.ArrayList, java.text.DecimalFormat, model.*, dao.*"%>
+    import="java.util.ArrayList, java.text.DecimalFormat, java.math.BigDecimal, model.*, dao.*"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,16 +9,17 @@
 </head>
 <body>
 <%
+	// 4 Thuộc tính ẩn
+	// -manager: Manager7
+    // -listFoodCategories : ArrayList<MenuItemCategory7>
+    // -listSearchedFood : ArrayList<Food7>
+    // -listComboItems : ArrayList<ComboItem7>
     Manager7 manager = (Manager7) session.getAttribute("manager");
     if (manager == null) {
         response.sendRedirect(request.getContextPath() + "/LoginUI.jsp?err=timeout");
         return;
     }
 
-    // 3 Thuộc tính ẩn theo đúng sơ đồ lớp thiết kế 3.4.2:
-    // -listFoodCategories : ArrayList<MenuItemCategory7>
-    // -listSearchedFood : ArrayList<Food7>
-    // -listComboItems : ArrayList<ComboItem7>
     @SuppressWarnings("unchecked")
     ArrayList<MenuItemCategory7> listFoodCategories = (ArrayList<MenuItemCategory7>) request.getAttribute("listFoodCategories");
     if (listFoodCategories == null) {
@@ -42,31 +43,8 @@
     if (listComboItems == null) {
         listComboItems = new ArrayList<>();
     }
-
-    Float totalOrigObj = (Float) request.getAttribute("totalOriginalPrice");
-    if (totalOrigObj == null) {
-        totalOrigObj = (Float) session.getAttribute("totalOriginalPrice");
-    }
-    float totalOriginalPrice = (totalOrigObj != null) ? totalOrigObj : 0f;
-
-    String inFoodKeywordVal = (String) request.getAttribute("inFoodKeyword");
-    if (inFoodKeywordVal == null) inFoodKeywordVal = "";
-
-    Integer selectedCatObj = (Integer) request.getAttribute("selectedFoodCategory");
-    int selectedFoodCategory = (selectedCatObj != null) ? selectedCatObj : 0;
-
-    String draftName = (String) session.getAttribute("draftComboName");
-    if (draftName == null) draftName = "";
-    String draftPrice = (String) session.getAttribute("draftComboPrice");
-    if (draftPrice == null) draftPrice = "";
-    String draftImage = (String) session.getAttribute("draftComboImage");
-    if (draftImage == null) draftImage = "";
-    String draftDesc = (String) session.getAttribute("draftComboDescription");
-    if (draftDesc == null) draftDesc = "";
-
-    String errorMsg = (String) request.getAttribute("errorMsg");
 %>
-    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-3">
+    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-2">
         <div class="container">
             <a class="navbar-brand fw-bold" href="<%=request.getContextPath()%>/manager/ManagerMainUI.jsp">
                 RESTMAN - LÊN MENU COMBO
@@ -81,9 +59,9 @@
         <!-- Thuộc tính ẩn manager -->
         <input type="hidden" id="managerId" name="managerId" value="<%=manager.getId()%>" />
 
-        <% if (errorMsg != null && !errorMsg.isEmpty()) { %>
+        <% if (request.getAttribute("errorMsg") != null && !((String) request.getAttribute("errorMsg")).isEmpty()) { %>
             <div class="alert alert-danger">
-                <%=errorMsg%>
+                ${errorMsg}
             </div>
         <% } %>
 
@@ -97,25 +75,28 @@
 
                     <form id="searchFoodForm" action="<%=request.getContextPath()%>/ComboServlet" method="get" class="row g-2 align-items-end mb-3">
                         <input type="hidden" id="searchFoodAction" name="action" value="searchFood" />
-                        <input type="hidden" name="inComboName" value="<%=draftName%>" />
-                        <input type="hidden" name="inComboPrice" value="<%=draftPrice%>" />
-                        <input type="hidden" name="inComboImage" value="<%=draftImage%>" />
-                        <input type="hidden" name="inComboDescription" value="<%=draftDesc%>" />
+                        <input type="hidden" name="inComboName" value="${draftComboName}" />
+                        <input type="hidden" name="inComboPrice" value="${draftComboPrice}" />
+                        <input type="hidden" name="inComboImage" value="${draftComboImage}" />
+                        <input type="hidden" name="inComboDescription" value="${draftComboDescription}" />
 
                         <!-- Ô từ khóa tên món -inFoodKeyword : text -->
                         <div class="col-md-5">
                             <label for="inFoodKeyword" class="form-label small fw-semibold">Tên món ăn:</label>
                             <input type="text" id="inFoodKeyword" name="inFoodKeyword" class="form-control form-control-sm"
-                                   value="<%=inFoodKeywordVal%>" placeholder="Nhập tên món..." />
+                                   value="${inFoodKeyword}" placeholder="Nhập tên món..." />
                         </div>
 
                         <!-- Dropdown chọn thể loại -inFoodCategory : dropdown -->
                         <div class="col-md-4">
                             <label for="inFoodCategory" class="form-label small fw-semibold">Thể loại:</label>
                             <select id="inFoodCategory" name="inFoodCategory" class="form-select form-select-sm">
-                                <option value="0" <%= (selectedFoodCategory == 0) ? "selected" : "" %>>-- Tất cả --</option>
-                                <% for (MenuItemCategory7 cat : listFoodCategories) { %>
-                                    <option value="<%=cat.getId()%>" <%= (selectedFoodCategory == cat.getId()) ? "selected" : "" %>>
+                                <option value="0" ${empty selectedFoodCategory || selectedFoodCategory == 0 ? "selected" : ""}>-- Tất cả --</option>
+                                <% 
+                                    Integer selCat = (Integer) request.getAttribute("selectedFoodCategory");
+                                    for (MenuItemCategory7 cat : listFoodCategories) { 
+                                %>
+                                    <option value="<%=cat.getId()%>" <%= (selCat != null && selCat == cat.getId()) ? "selected" : "" %>>
                                         <%=cat.getName()%>
                                     </option>
                                 <% } %>
@@ -170,7 +151,7 @@
                                     <td class="text-center"><%=(i + 1)%></td>
                                     <td class="text-center"><code><%=f.getItemCode()%></code></td>
                                     <td class="fw-semibold"><%=f.getName()%></td>
-                                    <td class="text-center"><%=f.getCategory() != null ? f.getCategory().getName() : ""%></td>
+                                    <td class="text-center"><%=f.getMenuItemCategory() != null ? f.getMenuItemCategory().getName() : ""%></td>
                                     <td class="text-end fw-semibold"><%=new DecimalFormat("#,###").format(f.getPrice())%></td>
                                     <td>
                                         <form id="selectForm_<%=f.getId()%>" action="<%=request.getContextPath()%>/ComboServlet" method="post" class="d-flex gap-1">
@@ -240,13 +221,13 @@
                                     for (int i = 0; i < listComboItems.size(); i++) {
                                         ComboItem7 ci = listComboItems.get(i);
                                         Food7 f = ci.getFood();
-                                        float subTotal = f.getPrice() * ci.getQuantity();
+                                        BigDecimal subTotal = (f.getPrice() != null) ? f.getPrice().multiply(BigDecimal.valueOf(ci.getQuantity())) : BigDecimal.ZERO;
                             %>
                                 <tr>
                                     <td class="text-center"><%=(i + 1)%></td>
                                     <td class="text-center"><code><%=f.getItemCode()%></code></td>
                                     <td class="fw-semibold"><%=f.getName()%></td>
-                                    <td class="text-center"><%=f.getCategory() != null ? f.getCategory().getName() : ""%></td>
+                                    <td class="text-center"><%=f.getMenuItemCategory() != null ? f.getMenuItemCategory().getName() : ""%></td>
                                     <td class="text-center fw-bold"><%=ci.getQuantity()%></td>
                                     <td class="text-end"><%=new DecimalFormat("#,###").format(f.getPrice())%></td>
                                     <td class="text-end fw-bold"><%=new DecimalFormat("#,###").format(subTotal)%></td>
@@ -278,6 +259,13 @@
                     <!-- Dòng tổng tiền gốc tạm tính -totalOriginalPrice : text -->
                     <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded border mb-4">
                         <span class="fw-semibold">Tổng tiền giá lẻ gốc tạm tính:</span>
+                        <%
+                            BigDecimal totalOrig = (BigDecimal) request.getAttribute("totalOriginalPrice");
+                            if (totalOrig == null) {
+                                totalOrig = (BigDecimal) session.getAttribute("totalOriginalPrice");
+                            }
+                            BigDecimal totalOriginalPrice = (totalOrig != null) ? totalOrig : BigDecimal.ZERO;
+                        %>
                         <input type="text" id="totalOriginalPrice" name="totalOriginalPrice"
                                 class="form-control form-control-sm text-end fw-bold text-danger border-0 bg-transparent"
                                 style="width: 180px; font-size: 1rem;"
@@ -291,21 +279,21 @@
                     <!-- Form lưu Combo có enctype="multipart/form-data" để gửi file ảnh -->
                     <form id="saveComboForm" action="<%=request.getContextPath()%>/ComboServlet" method="post" enctype="multipart/form-data">
                         <input type="hidden" id="saveComboAction" name="action" value="saveCombo" />
-                        <input type="hidden" id="savedDraftImage" value="<%=draftImage%>" />
+                        <input type="hidden" id="savedDraftImage" value="${draftComboImage}" />
 
                         <div class="row g-3">
                             <!-- Ô nhập tên combo -inComboName : text -->
                             <div class="col-md-7">
                                 <label for="inComboName" class="form-label small fw-semibold">Tên Combo <span class="text-danger">*</span></label>
                                 <input type="text" id="inComboName" name="inComboName" class="form-control form-control-sm"
-                                       value="<%=draftName%>" placeholder="Ví dụ: Combo bữa tối" required />
+                                       value="${draftComboName}" placeholder="Ví dụ: Combo bữa tối" required />
                             </div>
 
                             <!-- Ô nhập đơn giá combo -inComboPrice : text -->
                             <div class="col-md-5">
                                 <label for="inComboPrice" class="form-label small fw-semibold">Đơn giá Combo (VNĐ) <span class="text-danger">*</span></label>
                                 <input type="number" id="inComboPrice" name="inComboPrice" class="form-control form-control-sm"
-                                       value="<%=draftPrice%>" placeholder="Ví dụ: 349000" min="1000" required />
+                                       value="${draftComboPrice}" placeholder="Ví dụ: 349000" min="1000" required />
                             </div>
 
                             <!-- Ô chọn file hình ảnh minh họa -inComboImage : select (file) -->
@@ -316,9 +304,9 @@
                                 <input type="file" id="inComboImage" name="inComboImage"
                                        class="form-control form-control-sm" accept="image/*"
                                        onchange="handleFileSelect(this)" />
-                                <div id="imagePreviewContainer" class="mt-2 <%= draftImage.isEmpty() ? "d-none" : "" %>">
+                                <div id="imagePreviewContainer" class="mt-2 ${empty draftComboImage ? 'd-none' : ''}">
                                     <span class="small text-muted d-block mb-1">Ảnh minh họa đã chọn:</span>
-                                    <img id="comboImagePreview" src="<%=draftImage%>" alt="Preview"
+                                    <img id="comboImagePreview" src="${draftComboImage}" alt="Preview"
                                          class="rounded border" style="max-height: 110px; object-fit: cover;"
                                          onerror="this.onerror=null; this.src='<%=request.getContextPath()%>/uploads/default-food.jpg';" />
                                 </div>
@@ -329,7 +317,7 @@
                                 <label for="inComboDescription" class="form-label small fw-semibold">Mô tả Combo</label>
                                 <textarea id="inComboDescription" name="inComboDescription" rows="2"
                                           class="form-control form-control-sm"
-                                          placeholder="Ví dụ: Combo siêu tiết kiệm"><%=draftDesc%></textarea>
+                                          placeholder="Ví dụ: Combo siêu tiết kiệm">${draftComboDescription}</textarea>
                             </div>
                         </div>
 

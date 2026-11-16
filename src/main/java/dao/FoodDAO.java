@@ -33,7 +33,7 @@ public class FoodDAO extends DAO {
                 food.setId(rs.getInt("id"));
                 food.setItemCode(rs.getString("itemCode"));
                 food.setName(rs.getString("name"));
-                food.setPrice(rs.getFloat("price"));
+                food.setPrice(rs.getBigDecimal("price"));
                 food.setImageUrl(rs.getString("imageUrl"));
                 food.setDescription(rs.getString("description"));
                 food.setUnit(rs.getString("unit"));
@@ -44,7 +44,7 @@ public class FoodDAO extends DAO {
                     rs.getString("catName"),
                     rs.getString("catDesc")
                 );
-                food.setCategory(cat);
+                food.setMenuItemCategory(cat);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,7 +92,7 @@ public class FoodDAO extends DAO {
                 food.setId(rs.getInt("id"));
                 food.setItemCode(rs.getString("itemCode"));
                 food.setName(rs.getString("name"));
-                food.setPrice(rs.getFloat("price"));
+                food.setPrice(rs.getBigDecimal("price"));
                 food.setImageUrl(rs.getString("imageUrl"));
                 food.setDescription(rs.getString("description"));
                 food.setUnit(rs.getString("unit"));
@@ -103,7 +103,7 @@ public class FoodDAO extends DAO {
                     rs.getString("catName"),
                     rs.getString("catDesc")
                 );
-                food.setCategory(cat);
+                food.setMenuItemCategory(cat);
                 list.add(food);
             }
         } catch (Exception e) {

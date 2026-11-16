@@ -1,7 +1,7 @@
 package model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class Member7 implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -9,7 +9,7 @@ public class Member7 implements Serializable {
     private String username;
     private String password;
     private String fullName;
-    private Date dob;
+    private LocalDate dob;
     private String address;
     private String email;
     private String phone;
@@ -19,7 +19,7 @@ public class Member7 implements Serializable {
     public Member7() {
     }
 
-    public Member7(int id, String username, String password, String fullName, Date dob, String address, String email, String phone, String role, String note) {
+    public Member7(int id, String username, String password, String fullName, LocalDate dob, String address, String email, String phone, String role, String note) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -44,8 +44,9 @@ public class Member7 implements Serializable {
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
 
-    public Date getDob() { return dob; }
-    public void setDob(Date dob) { this.dob = dob; }
+    public LocalDate getDob() { return dob; }
+    public void setDob(LocalDate dob) { this.dob = dob; }
+    public void setDob(java.sql.Date dob) { this.dob = (dob != null) ? dob.toLocalDate() : null; }
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }

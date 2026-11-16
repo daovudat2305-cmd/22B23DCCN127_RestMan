@@ -15,7 +15,7 @@
         return;
     }
 
-    // Các thuộc tính ẩn theo đúng sơ đồ lớp thiết kế 3.3.2:
+    // Các thuộc tính ẩn:
     // -listCategory : ArrayList<MenuItemCategory7>
     // -listResult : ArrayList<MenuItem7>
     @SuppressWarnings("unchecked")
@@ -33,7 +33,7 @@
     Integer selectedCatObj = (Integer) request.getAttribute("selectedCategory");
     int selectedCategory = (selectedCatObj != null) ? selectedCatObj : 0;
 %>
-    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-3">
+    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-2">
         <div class="container">
             <a class="navbar-brand fw-bold" href="<%=request.getContextPath()%>/customer/CustomerMainUI.jsp">
                 RESTMAN
@@ -51,11 +51,11 @@
         <div class="restman-card p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
                 <div>
-                    <h4 class="fw-bold mb-0">Tìm kiếm thông tin món ăn</h4>
+                    <h5 class="fw-bold mb-0">Tìm kiếm thông tin món ăn</h5>
                     <small class="text-muted">Nhập từ khóa tên món ăn hoặc lọc theo thể loại thực đơn</small>
                 </div>
                 <!-- Nút -btnBack : button -->
-                <button type="button" id="btnBack" name="btnBack" class="btn btn-outline-secondary"
+                <button type="button" id="btnBack" name="btnBack" class="btn btn-outline-secondary btn-sm"
                         onclick="openPage('<%=request.getContextPath()%>/customer/CustomerMainUI.jsp')">
                     Quay lại
                 </button>
@@ -97,7 +97,7 @@
             </form>
         </div>
 
-        <!-- Khu vực hiển thị kết quả tìm kiếm: Bảng -tblMenuItem : Table -->
+        <!-- Kết quả tìm kiếm: Bảng -tblMenuItem : Table -->
         <div class="restman-card p-4">
             <h5 class="fw-bold mb-3">Danh sách kết quả tìm kiếm</h5>
             <%
@@ -147,7 +147,7 @@
                                         <span class="badge badge-food">Món lẻ</span>
                                     <% } %>
                                 </td>
-                                <td class="text-center"><%=item.getCategory() != null ? item.getCategory().getName() : ""%></td>
+                                <td class="text-center"><%=item.getMenuItemCategory() != null ? item.getMenuItemCategory().getName() : ""%></td>
                                 <td class="text-end fw-bold text-danger"><%=new DecimalFormat("#,###").format(item.getPrice())%></td>
                                 <td class="text-center">
                                     <%
@@ -163,6 +163,7 @@
                                     <img src="<%=itemImg%>" alt="<%=item.getName()%>" class="food-thumb"
                                          onerror="this.onerror=null; this.src='<%=request.getContextPath()%>/uploads/default-food.jpg';" />
                                 </td>
+                                <!-- -linkViewDetail -->
                                 <td class="text-center">
                                     <% if (isCombo) { %>
                                         <a id="btnViewDetail_<%=item.getId()%>" name="btnViewDetail"

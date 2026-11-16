@@ -9,22 +9,22 @@
 </head>
 <body>
 <%
+    // 2 Thuộc tính ẩn
+    // -manager: Manager7
+    // -listCombo : ArrayList<Combo7>
     Manager7 manager = (Manager7) session.getAttribute("manager");
     if (manager == null) {
         response.sendRedirect(request.getContextPath() + "/LoginUI.jsp?err=timeout");
         return;
     }
 
-    // Thuộc tính ẩn -listCombo : ArrayList<Combo7> theo đúng sơ đồ lớp thiết kế 3.4.2
     @SuppressWarnings("unchecked")
     ArrayList<Combo7> listCombo = (ArrayList<Combo7>) request.getAttribute("listCombo");
     if (listCombo == null) {
         listCombo = (new ComboDAO()).getAllCombo();
     }
-
-    String successMsg = (String) request.getAttribute("successMsg");
 %>
-    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-3">
+    <nav class="navbar navbar-expand-lg navbar-dark restman-navbar py-2">
         <div class="container">
             <a class="navbar-brand fw-bold" href="<%=request.getContextPath()%>/manager/ManagerMainUI.jsp">
                 RESTMAN - QUẢN LÝ COMBO
@@ -39,27 +39,27 @@
         <!-- Thuộc tính ẩn manager -->
         <input type="hidden" id="managerId" name="managerId" value="<%=manager.getId()%>" />
 
-        <% if (successMsg != null && !successMsg.isEmpty()) { %>
+        <% if (request.getAttribute("successMsg") != null && !((String) request.getAttribute("successMsg")).isEmpty()) { %>
             <script>
-                alert("<%=successMsg%>");
+                alert("${successMsg}");
             </script>
         <% } %>
 
         <div class="restman-card p-4">
             <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
                 <div>
-                    <h4 class="fw-bold mb-0">Danh sách thực đơn Combo</h4>
+                    <h5 class="fw-bold mb-0">Danh sách thực đơn Combo</h5>
                     <small class="text-muted">Các gói combo hiện có trên hệ thống thực đơn bán hàng</small>
                 </div>
                 <div class="d-flex gap-2">
                     <!-- Nút -btnAddCombo : button -->
-                    <button type="button" id="btnAddCombo" name="btnAddCombo" class="btn btn-restman"
+                    <button type="button" id="btnAddCombo" name="btnAddCombo" class="btn btn-restman btn-sm"
                             onclick="openPage('<%=request.getContextPath()%>/ComboServlet?action=showAddForm')">
                         Thêm combo mới
                     </button>
 
                     <!-- Nút -btnBack : button -->
-                    <button type="button" id="btnBack" name="btnBack" class="btn btn-outline-secondary"
+                    <button type="button" id="btnBack" name="btnBack" class="btn btn-outline-secondary btn-sm"
                             onclick="openPage('<%=request.getContextPath()%>/manager/ManagerMainUI.jsp')">
                         Quay lại
                     </button>
