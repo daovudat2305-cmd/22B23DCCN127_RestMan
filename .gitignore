@@ -1,0 +1,17 @@
+# Eclipse build & metadata
+build/
+bin/
+.settings/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Logs & temporary files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
